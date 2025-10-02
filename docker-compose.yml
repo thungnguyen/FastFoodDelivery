@@ -1,0 +1,28 @@
+user-db:
+  image: postgres:14
+  restart: always
+  environment:
+    POSTGRES_USER: postgres
+    POSTGRES_PASSWORD: postgres
+    POSTGRES_DB: fastfood
+  ports:
+    - "5433:5432"   # local connect nếu cần
+  volumes:
+    - user_db_data:/var/lib/postgresql/data
+
+user-service:
+  build: ./services/user-service
+  ports:
+    - "4001:4001"
+  environment:
+    DB_USER: postgres
+    DB_PASS: postgres
+    DB_HOST: user-db
+    DB_PORT: 5432
+    DB_NAME: fastfood
+    JWT_SECRET: secret
+  depends_on:
+    - user-db
+
+volumes:
+  user_db_data:
