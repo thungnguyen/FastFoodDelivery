@@ -1,19 +1,20 @@
 const express = require("express");
 const cors = require("cors");
-const userRoutes = require("./routes/userRoutes");
+const authRoutes = require("./routes/auth");
 require("dotenv").config();
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.use("/api/users", userRoutes);
+app.use("/api/auth", authRoutes);
 
-app.get("/", (req, res) => {
-  res.send("User Service is running 🚀");
+// health check
+app.get("/health", (req, res) => {
+  res.json({ status: "OK", service: "user-service" });
 });
 
-const PORT = process.env.PORT || 4001;
-app.listen(PORT, () => {
-  console.log(`User Service running on port ${PORT}`);
+const port = process.env.PORT || 4001;
+app.listen(port, () => {
+  console.log(`User service listening on port ${port}`);
 });

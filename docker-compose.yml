@@ -1,56 +1,40 @@
 version: "3.9"
 
 services:
-  user-db:
-    image: postgres:14
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: user_db
+  # ==========================
+  # API GATEWAY
+  # ==========================
+  api-gateway:
+    build: ./services/api-gateway
     ports:
-      - "5433:5432"
-    volumes:
-      - user_db_data:/var/lib/postgresql/data
-      - ./db-init/user_db_init.sql:/docker-entrypoint-initdb.d/01_user_init.sql:ro
-
-  product-db:
-    image: postgres:14
+      - "4000:4000"
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: product_db
-    ports:
-      - "5434:5432"
-    volumes:
-      - product_db_data:/var/lib/postgresql/data
-      - ./db-init/product_db_init.sql:/docker-entrypoint-initdb.d/01_product_init.sql:ro
+      - PORT=4000
+    depends_on:
+      - user-service
+      - product-service
+      - order-service
+      - payment-service
 
-  order-db:
-    image: postgres:14
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: order_db
+  # ==========================
+  # MICROSERVICES
+  # ==========================
+  user-service:
+    build: ./services/user-service
     ports:
-      - "5435:5432"
-    volumes:
-      - order_db_data:/var/lib/postgresql/data
-      - ./db-init/order_db_init.sql:/docker-entrypoint-initdb.d/01_order_init.sql:ro
+      - "4001:4001"
 
-  payment-db:
-    image: postgres:14
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: payment_db
+  product-service:
+    build: ./services/product-service
     ports:
-      - "5436:5432"
-    volumes:
-      - payment_db_data:/var/lib/postgresql/data
-      - ./db-init/payment_db_init.sql:/docker-entrypoint-initdb.d/01_payment_init.sql:ro
+      - "4002:4002"
 
-volumes:
-  user_db_data:
-  product_db_data:
-  order_db_data:
-  payment_db_data:
+  order-service:
+    build: ./services/order-service
+    ports:
+      - "4003:4003"
+
+  payment-service:
+    build: ./services/payment-service
+    ports:
+      - "4004:4004"
