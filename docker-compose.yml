@@ -1,28 +1,56 @@
-user-db:
-  image: postgres:14
-  restart: always
-  environment:
-    POSTGRES_USER: postgres
-    POSTGRES_PASSWORD: postgres
-    POSTGRES_DB: fastfood
-  ports:
-    - "5433:5432"   # local connect nếu cần
-  volumes:
-    - user_db_data:/var/lib/postgresql/data
+version: "3.9"
 
-user-service:
-  build: ./services/user-service
-  ports:
-    - "4001:4001"
-  environment:
-    DB_USER: postgres
-    DB_PASS: postgres
-    DB_HOST: user-db
-    DB_PORT: 5432
-    DB_NAME: fastfood
-    JWT_SECRET: secret
-  depends_on:
-    - user-db
+services:
+  user-db:
+    image: postgres:14
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: user_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - user_db_data:/var/lib/postgresql/data
+      - ./db-init/user_db_init.sql:/docker-entrypoint-initdb.d/01_user_init.sql:ro
+
+  product-db:
+    image: postgres:14
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: product_db
+    ports:
+      - "5434:5432"
+    volumes:
+      - product_db_data:/var/lib/postgresql/data
+      - ./db-init/product_db_init.sql:/docker-entrypoint-initdb.d/01_product_init.sql:ro
+
+  order-db:
+    image: postgres:14
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: order_db
+    ports:
+      - "5435:5432"
+    volumes:
+      - order_db_data:/var/lib/postgresql/data
+      - ./db-init/order_db_init.sql:/docker-entrypoint-initdb.d/01_order_init.sql:ro
+
+  payment-db:
+    image: postgres:14
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: payment_db
+    ports:
+      - "5436:5432"
+    volumes:
+      - payment_db_data:/var/lib/postgresql/data
+      - ./db-init/payment_db_init.sql:/docker-entrypoint-initdb.d/01_payment_init.sql:ro
 
 volumes:
   user_db_data:
+  product_db_data:
+  order_db_data:
+  payment_db_data:
